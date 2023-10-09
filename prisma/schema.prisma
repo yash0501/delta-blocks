@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  email String
+  password String?
+  walletAddress String?
+  bankDetails String?
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  admin User[]
+  // adminId Int
+  // members User @relation(fields: [memberId], references: [id])
+  // memberId Int
+  walletAddresses WalletPath @relation(fields: [walletAddressId], references: [id])
+  walletAddressId Int
+  gameId String @unique
+  secretKeyHash String @unique
+  whitelistedIps String?
+  nodeId String?
+  permissions Permissions[]
+  analytics Analytics @relation(fields: [analyticsId], references: [id])
+  analyticsId Int
+  invoices Invoice @relation(fields: [invoicesId], references: [id])
+  invoicesId Int
+}
+
+model Permissions {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  action String
+  comparison String
+  limit Int
+}
+
+model WalletPath {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  alias String?
+  // parent is a self relation
+  // parent WalletPath? @relation("ParentChild", fields: [parentId], references: [id])
+  // parentId Int?
+  child String?
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+}
+
+model Analytics {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  action String
+  timestamp DateTime
+}
+
+model Invoice {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  startDate DateTime
+  endDate DateTime
+  usageBills String
+}
